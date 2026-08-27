@@ -1,0 +1,29 @@
+# 统一行尾规则：所有文本文件以 LF 存储，避免 Windows(CRLF) / macOS(LF) 之间的假差异
+* text=auto eol=lf
+
+# Windows 批处理脚本：强制 CRLF（cmd.exe 最兼容）
+*.bat text eol=crlf
+
+# macOS / Linux 可执行脚本：强制 LF（shell 脚本必须 LF，否则可能报错）
+*.command text eol=lf
+*.sh text eol=lf
+
+# Python / Web 源文件：明确按文本处理
+*.py text
+*.html text
+*.css text
+*.js text
+*.json text
+*.md text
+*.svg text
+
+# 二进制文件：禁止行尾转换，避免损坏
+*.png binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.zip binary

@@ -205,7 +205,7 @@ def main():
             height=800,
             min_size=(900, 600),
             resizable=True,
-            text_select=False
+            text_select=True
         )
         webview.start(debug=False)
     except Exception as e:

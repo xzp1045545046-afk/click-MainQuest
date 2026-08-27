@@ -11,6 +11,10 @@ __pycache__/
 *$py.class
 *.so
 
+# Python virtualenv
+venv/
+.venv/
+
 # User data
 data.json
 data.json.bak
