@@ -6,8 +6,8 @@ set PYTHONPATH=
 set "PYW="
 if exist "venv\Scripts\pythonw.exe" (
     set "PYW=venv\Scripts\pythonw.exe"
-) else if exist "%USERPROFILE%\.workbuddy\binaries\python\versions\3.13.12\pythonw.exe" (
-    set "PYW=%USERPROFILE%\.workbuddy\binaries\python\versions\3.13.12\pythonw.exe"
+) else if exist "%USERPROFILE%\.workbuddy\binaries\python\envs\default\Scripts\pythonw.exe" (
+    set "PYW=%USERPROFILE%\.workbuddy\binaries\python\envs\default\Scripts\pythonw.exe"
 ) else (
     for /f "delims=" %%i in ('where pythonw 2^>nul') do (
         set "PYW=%%i"
@@ -19,6 +19,8 @@ if exist "venv\Scripts\pythonw.exe" (
 if defined PYW (
     start "" "%PYW%" "app.py"
 ) else (
-    echo Error: æ‰¾ä¸åˆ° pythonw.exeï¼Œè¯·ç¡®ä¿ Python å·²å®‰è£…å¹¶åŠ å…¥ PATHï¼Œæˆ–åˆ›å»º venvã€‚
+    echo Error: ÕÒ²»µ½ pythonw.exe£¬ÇëÈ·±£ Python ÒÑ°²×°²¢¼ÓÈë PATH£¬»ò´´½¨ venv¡£
+    echo ÄãÒ²¿ÉÒÔÔËĞĞ£ºpython -m venv venv
+    echo      È»ºó£ºvenv\Scripts\pip install pywebview
     pause
 )
