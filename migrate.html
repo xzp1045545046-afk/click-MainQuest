@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据迁移助手 - 任务手册</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:#0b0e14; color:#e8d9b8; font-family:'Courier New',monospace;
+  }
+  .card {
+    width:min(560px,92vw); background:#141a24; border:2px solid #5a3d14;
+    border-radius:12px; padding:28px 30px;
+  }
+  h1 { font-size:20px; color:#ffd27a; letter-spacing:2px; margin-bottom:6px; }
+  .sub { font-size:12px; color:#9a8f77; margin-bottom:22px; }
+  .row { font-size:13px; line-height:2; }
+  .row b { color:#ffd27a; }
+  .status { margin-top:18px; padding:14px 16px; border-radius:8px; font-size:13px; line-height:1.9; }
+  .ok { background:#12331c; border:1px solid #2e7d46; color:#8fe3a8; }
+  .warn { background:#33270f; border:1px solid #8a6a1f; color:#f3d58a; }
+  .err { background:#3a1616; border:1px solid #8f2b2b; color:#f0a0a0; }
+  .small { margin-top:16px; font-size:11px; color:#6f6755; line-height:1.8; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>数据迁移助手</h1>
+  <div class="sub">把当前浏览器里的旧任务数据一次性同步到本地文件</div>
+  <div class="row">本机 localStorage 中找到：<b id="cnt">-</b> 条任务</div>
+  <div class="row">目标服务：<b>http://127.0.0.1:8765/data</b></div>
+  <div id="status" class="status">正在读取本地数据…</div>
+  <div class="small">说明：本页面只会做「读取本地 → 上传到同步服务」一次动作，不会修改你的任务。<br>完成后关闭本页面即可，桌面图标与预览面板将共享同一份数据。</div>
+</div>
+<script>
+(function () {
+  var KEY = 'light-todo-v4';
+  var SYNC = 'http://127.0.0.1:8765/data';
+  var status = document.getElementById('status');
+  var cntEl = document.getElementById('cnt');
+  var raw = localStorage.getItem(KEY);
+  var data;
+  try { data = raw ? JSON.parse(raw) : null; } catch (e) { data = null; }
+  var n = (data && Array.isArray(data.todos)) ? data.todos.length : 0;
+  cntEl.textContent = n;
+
+  function done(cls, html) { status.className = 'status ' + cls; status.innerHTML = html; }
+
+  if (!data || n === 0) {
+    done('warn', '⚠ 当前浏览器里没有找到旧任务数据（<b>0 条</b>）。<br>如果任务之前显示正常，可能是当前入口与数据所在的浏览器不一致，请告诉我你的实际情况。');
+    return;
+  }
+
+  fetch(SYNC, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+    .then(function (r) { return r.json(); })
+    .then(function (res) {
+      if (res && res.ok) {
+        done('ok', '✔ 迁移成功！已把 <b>' + n + '</b> 条任务上传到 data.json。<br>现在打开桌面「任务手册」图标（或刷新预览面板），即可看到全部任务。');
+      } else {
+        done('err', '✘ 服务返回异常：' + (res && res.err ? res.err : '未知错误'));
+      }
+    })
+    .catch(function (e) {
+      done('err', '✘ 上传失败：' + e.message + '<br>请确认同步服务已启动（可让我帮你检查）。');
+    });
+})();
+</script>
+</body>
+</html>

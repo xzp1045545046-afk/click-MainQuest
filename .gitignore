@@ -1,0 +1,24 @@
+# Logs
+app.log
+*.log
+
+# Runtime lock file
+app.lock
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# User data
+data.json
+data.json.bak
+
+# Deployment artifacts
+dist/
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
