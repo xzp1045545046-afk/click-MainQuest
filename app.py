@@ -2,6 +2,7 @@ import json
 import os
 import sys
 import logging
+import urllib.request
 import webview
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -9,6 +10,23 @@ DATA_FILE = os.path.join(BASE_DIR, 'data.json')
 HTML_FILE = os.path.join(BASE_DIR, 'todolist-dnf.html')
 LOG_FILE = os.path.join(BASE_DIR, 'app.log')
 LOCK_FILE = os.path.join(BASE_DIR, 'app.lock')
+
+# 桌面窗口优先走本地同步服务（http origin），云同步 SDK 的 CORS 在 file:// 下会被拒绝；
+# 服务不可用时回退 file://（本地功能正常，仅云同步不可用）
+SERVER_URL = 'http://127.0.0.1:8765/todolist-dnf.html'
+
+
+def server_available(url, timeout=2):
+    try:
+        req = urllib.request.Request(url, method='HEAD')
+        with urllib.request.urlopen(req, timeout=timeout):
+            return True
+    except Exception:
+        try:
+            with urllib.request.urlopen(url, timeout=timeout):
+                return True
+        except Exception:
+            return False
 
 logging.basicConfig(
     filename=LOG_FILE,
@@ -197,9 +215,11 @@ def main():
             sys.exit(1)
 
         logging.info('Starting 任务手册 desktop app.')
+        entry_url = SERVER_URL if server_available(SERVER_URL) else HTML_FILE
+        logging.info('Entry URL: %s', entry_url)
         window = webview.create_window(
             title='任务手册',
-            url=HTML_FILE,
+            url=entry_url,
             js_api=api,
             width=1280,
             height=800,

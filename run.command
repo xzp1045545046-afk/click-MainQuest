@@ -9,4 +9,10 @@ else
     PY="python3"
 fi
 
+# 确保本地同步服务（8765）在线，桌面版需经 http origin 加载才能用云同步
+if ! lsof -i :8765 -sTCP:LISTEN >/dev/null 2>&1; then
+    "$PY" server.py >/dev/null 2>&1 &
+    sleep 2
+fi
+
 "$PY" app.py
